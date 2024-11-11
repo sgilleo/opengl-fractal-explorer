@@ -44,6 +44,12 @@ int main(void)
         return -1;
     }
 
+    const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
+    const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
+    
+    std::cout << vendor << renderer << std::endl;
+
+
     glViewport(0, 0, WIDTH, HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
