@@ -3,8 +3,12 @@
 #include <iostream>
 #include "Shader.h"
 
-int WIDTH = 640;
-int HEIGHT = 640;
+int WIDTH = 1280;
+int HEIGHT = 720;
+
+float xcenter = 0.0f;
+float ycenter = 0.0f;
+float scale = 0.3f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -15,6 +19,56 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        ycenter = ycenter + 0.005f / scale;
+        if (ycenter > 2.0f)
+        {
+            ycenter = 2.0f;
+        }
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        ycenter = ycenter - 0.005f / scale;
+        if (ycenter < -2.0f)
+        {
+            ycenter = -2.0f;
+        }
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+        xcenter = xcenter - 0.005f / scale;
+        if (xcenter < -2.0f)
+        {
+            xcenter = -2.0f;
+        }
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+        xcenter = xcenter + 0.005f / scale;
+        if (xcenter > 1.0f)
+        {
+            xcenter = 1.0f;
+        }
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    {
+        scale = scale * 1.02f;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    {
+        scale = scale * 0.98f;
+        if (scale < 0.1f)
+        {
+            scale = 0.1f;
+        }
+    }
 }
 
 int main(void)
@@ -87,7 +141,7 @@ int main(void)
     glBindVertexArray(0);
 
     Shader shader("vertex.vs", "fragment.fs");
-
+    
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -99,6 +153,12 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.use();
+        shader.setInt("width", WIDTH);
+        shader.setInt("height", HEIGHT);
+        shader.setFloat("xcenter", xcenter);
+        shader.setFloat("ycenter", ycenter);
+        shader.setFloat("scale", scale);
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

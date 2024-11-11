@@ -3,7 +3,13 @@
 in vec4 gl_FragCoord;
 out vec4 FragColor;
 
-#define MAX_ITERATIONS 30
+#define MAX_ITERATIONS 300
+
+uniform float xcenter;
+uniform float ycenter;
+uniform float scale;
+uniform int width;
+uniform int height;
 
 int mandelbrot_iterations(float x, float y)
 {
@@ -18,7 +24,7 @@ int mandelbrot_iterations(float x, float y)
       real = real * real - imag * imag + x;
       imag = 2.0 * temp_real * imag + y;
 
-      if (real * real + imag * imag > 16.0)
+      if (real * real + imag * imag > 4.0)
       {
          break;
       } 
@@ -53,9 +59,11 @@ int julia_iterations(float x, float y, float julia_x, float julia_y)
 }
 vec4 return_color()
 {
-   float x = (gl_FragCoord.x / 640 - 0.5) * 4.0;
-   float y = -(gl_FragCoord.y / 640 - 0.5) * 4.0;
-   int iterations = julia_iterations(x, y, -0.5, -0.7);
+   float x = xcenter + (gl_FragCoord.x / width - 0.5) / scale;  
+   float y = ycenter + (2 * gl_FragCoord.y - height) / 2 / width / scale;
+
+   //int iterations = mandelbrot_iterations(x, y);
+   int iterations = julia_iterations(x, y, -0.57, -0.57);
    float color = float(iterations) / MAX_ITERATIONS;
    return vec4(color, color, color, 1.0f);
 }
