@@ -3,12 +3,17 @@
 #include <iostream>
 #include "Shader.h"
 
-int WIDTH = 1280;
-int HEIGHT = 720;
+int WIDTH = 640;
+int HEIGHT = 480;
 
-float xcenter = 0.0f;
-float ycenter = 0.0f;
-float scale = 0.3f;
+double xcenter = 0.0;
+double ycenter = 0.0;
+double scale = 0.5;
+float iterations = 300;
+
+double prevTime = 0.0f;
+double currentTime = 0.0f;
+double timeDiff;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -20,36 +25,36 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     
-    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        ycenter = ycenter + 0.005f / scale;
+        ycenter = ycenter + 0.01f / scale;
         if (ycenter > 2.0f)
         {
             ycenter = 2.0f;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        ycenter = ycenter - 0.005f / scale;
+        ycenter = ycenter - 0.01f / scale;
         if (ycenter < -2.0f)
         {
             ycenter = -2.0f;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        xcenter = xcenter - 0.005f / scale;
+        xcenter = xcenter - 0.01f / scale;
         if (xcenter < -2.0f)
         {
             xcenter = -2.0f;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        xcenter = xcenter + 0.005f / scale;
+        xcenter = xcenter + 0.01f / scale;
         if (xcenter > 1.0f)
         {
             xcenter = 1.0f;
@@ -58,17 +63,43 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-        scale = scale * 1.02f;
+        scale = scale * 1.05f;
     }
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
     {
-        scale = scale * 0.98f;
-        if (scale < 0.1f)
+        scale = scale * 0.95f;
+        if (scale < 0.5f)
         {
-            scale = 0.1f;
+            scale = 0.5f;
         }
     }
+
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        iterations *= 1.05f;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        iterations *= 0.95f;
+        if (iterations < 50)
+        {
+            iterations = 10;
+        }
+    }
+}
+
+static void update_window_title(GLFWwindow* window)
+{
+    currentTime = glfwGetTime();
+    timeDiff = currentTime - prevTime;
+
+    std::string FPS = std::to_string(1.0 / timeDiff);
+    std::string ms = std::to_string(timeDiff * 1000);
+    std::string new_title = "Fractal Explorer - " + FPS + " fps - " + ms + " ms";
+    glfwSetWindowTitle(window, new_title.c_str());
+    prevTime = currentTime;
 }
 
 int main(void)
@@ -78,8 +109,8 @@ int main(void)
     /* Initialize the library */
     if (!glfwInit())
         return -1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
@@ -141,23 +172,25 @@ int main(void)
     glBindVertexArray(0);
 
     Shader shader("vertex.vs", "fragment.fs");
-    
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        update_window_title(window);
+
         processInput(window);
 
         /* Render here */
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.use();
         shader.setInt("width", WIDTH);
         shader.setInt("height", HEIGHT);
-        shader.setFloat("xcenter", xcenter);
-        shader.setFloat("ycenter", ycenter);
-        shader.setFloat("scale", scale);
+        shader.setDouble("xcenter", xcenter);
+        shader.setDouble("ycenter", ycenter);
+        shader.setDouble("scale", scale);
+        shader.setInt("max_iterations", (int)iterations);
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
