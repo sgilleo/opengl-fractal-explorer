@@ -12,6 +12,8 @@
                 "${file}",
                 "${workspaceFolder}/src/glad.c",
                 "-lglfw3dll",
+                "-lncurses",
+                "-DNCURSES_STATIC",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],

@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include <ncurses/ncurses.h>
 
 int WIDTH = 640;
 int HEIGHT = 480;
@@ -113,6 +114,8 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    initscr();
+
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(WIDTH, HEIGHT, "Fractal Explorer", NULL, NULL);
     if (!window)
@@ -129,11 +132,15 @@ int main(void)
         return -1;
     }
 
+
     const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
     const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
     
-    std::cout << vendor << renderer << std::endl;
-
+    //std::cout << vendor << renderer << std::endl;
+    move();
+    printw(reinterpret_cast<const char*>(vendor));
+    printw(reinterpret_cast<const char*>(renderer));
+    
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -192,6 +199,8 @@ int main(void)
         shader.setDouble("scale", scale);
         shader.setInt("max_iterations", (int)iterations);
 
+        refresh();
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -207,5 +216,6 @@ int main(void)
     glDeleteBuffers(1, &EBO);
 
     glfwTerminate();
+    endwin();
     return 0;
 }
