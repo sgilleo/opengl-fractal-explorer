@@ -63,8 +63,8 @@ vec4 return_color()
    double x = xcenter + screen_ratio * (gl_FragCoord.x / width - 0.5) / scale;  
    double y = ycenter + (gl_FragCoord.y / height - 0.5) / scale;
 
-   int iterations = mandelbrot_iterations(x, y);
-   //int iterations = julia_iterations(x, y, -0.57, -0.57);
+   //int iterations = mandelbrot_iterations(x, y);
+   int iterations = julia_iterations(x, y, -0.3, -0.57);
    
    float r, g, b;
 

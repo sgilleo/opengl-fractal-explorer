@@ -115,7 +115,10 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     initscr();
-
+    int console_width, console_height;
+    getmaxyx(stdscr, console_height, console_width);
+    WINDOW* console_window = newwin(console_height, console_width, 0, 0);
+    
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(WIDTH, HEIGHT, "Fractal Explorer", NULL, NULL);
     if (!window)
@@ -137,9 +140,7 @@ int main(void)
     const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
     
     //std::cout << vendor << renderer << std::endl;
-    move();
-    printw(reinterpret_cast<const char*>(vendor));
-    printw(reinterpret_cast<const char*>(renderer));
+    
     
 
     glViewport(0, 0, WIDTH, HEIGHT);
@@ -180,6 +181,19 @@ int main(void)
 
     Shader shader("vertex.vs", "fragment.fs");
 
+    box(console_window, 0, 0);
+
+    mvwprintw(console_window, 1, console_width/2-15, "Current Graphics Device:");
+    move(2, 35);
+    mvwprintw(console_window, 2, console_width/2-20, reinterpret_cast<const char*>(renderer));
+    
+
+    WINDOW* parameters_win = newwin(10, 40, 3, 3);
+    box(parameters_win, 0, 0);
+    
+    refresh();
+    wrefresh(console_window);
+    wrefresh(parameters_win);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -199,7 +213,13 @@ int main(void)
         shader.setDouble("scale", scale);
         shader.setInt("max_iterations", (int)iterations);
 
-        refresh();
+        mvwprintw(parameters_win, 0, 3, "Fractal Data");
+        mvwprintw(parameters_win, 1, 1, "Re: %.16f", xcenter);
+        mvwprintw(parameters_win, 2, 1, "Im: %.16f", ycenter);
+        mvwprintw(parameters_win, 3, 1, "Zoom: %18.1f", scale);
+        mvwprintw(parameters_win, 4, 1, "Iterations: %6d", int(iterations));
+        wrefresh(parameters_win);
+
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
