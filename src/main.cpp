@@ -11,6 +11,9 @@ double xcenter = 0.0;
 double ycenter = 0.0;
 double scale = 0.5;
 float iterations = 300;
+int fractal = 0; //0 = Mandelbrot, 1 = Julia
+double xjulia = 0.0;
+double yjulia = 0.0;
 
 double prevTime = 0.0f;
 double currentTime = 0.0f;
@@ -88,6 +91,26 @@ void processInput(GLFWwindow *window)
         {
             iterations = 10;
         }
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+    {
+        yjulia = yjulia + 0.01f / scale;
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+    {
+        yjulia = yjulia - 0.01f / scale;
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+    {
+        xjulia = xjulia - 0.01f / scale;
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+    {
+        xjulia = xjulia + 0.01f / scale;
     }
 }
 
@@ -194,6 +217,7 @@ int main(void)
     refresh();
     wrefresh(console_window);
     wrefresh(parameters_win);
+  
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -211,7 +235,10 @@ int main(void)
         shader.setDouble("xcenter", xcenter);
         shader.setDouble("ycenter", ycenter);
         shader.setDouble("scale", scale);
+        shader.setDouble("xjulia", xjulia);
+        shader.setDouble("yjulia", yjulia);
         shader.setInt("max_iterations", (int)iterations);
+        shader.setInt("fractal", fractal);
 
         mvwprintw(parameters_win, 0, 3, "Fractal Data");
         mvwprintw(parameters_win, 1, 1, "Re: %.16f", xcenter);
@@ -220,7 +247,7 @@ int main(void)
         mvwprintw(parameters_win, 4, 1, "Iterations: %6d", int(iterations));
         wrefresh(parameters_win);
 
-
+        
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

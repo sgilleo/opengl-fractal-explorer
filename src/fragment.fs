@@ -7,7 +7,10 @@ out vec4 FragColor;
 uniform double xcenter;
 uniform double ycenter;
 uniform double scale;
+uniform double xjulia;
+uniform double yjulia;
 uniform int max_iterations;
+uniform int fractal;
 uniform int width;
 uniform int height;
 
@@ -63,8 +66,16 @@ vec4 return_color()
    double x = xcenter + screen_ratio * (gl_FragCoord.x / width - 0.5) / scale;  
    double y = ycenter + (gl_FragCoord.y / height - 0.5) / scale;
 
-   //int iterations = mandelbrot_iterations(x, y);
-   int iterations = julia_iterations(x, y, -0.3, -0.57);
+   int iterations;
+
+   if (fractal == 0)
+   {
+      iterations = mandelbrot_iterations(x, y);
+   }
+   if (fractal == 1)
+   {
+      iterations = julia_iterations(x, y, xjulia, yjulia);
+   }
    
    float r, g, b;
 
