@@ -18,7 +18,7 @@ double yjulia = 0.0;
 
 double prevTime = 0.0f;
 double currentTime = 0.0f;
-double timeDiff;
+double deltaT;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -32,7 +32,7 @@ void processInput(GLFWwindow *window)
     
     if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        ycenter = ycenter + 0.01f / scale;
+        ycenter += 0.01f / scale * deltaT*100;
         if (ycenter > 2.0f)
         {
             ycenter = 2.0f;
@@ -41,7 +41,7 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        ycenter = ycenter - 0.01f / scale;
+        ycenter -= 0.01f / scale * deltaT*100;
         if (ycenter < -2.0f)
         {
             ycenter = -2.0f;
@@ -50,7 +50,7 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        xcenter = xcenter - 0.01f / scale;
+        xcenter -= 0.01f / scale * deltaT*100;
         if (xcenter < -2.0f)
         {
             xcenter = -2.0f;
@@ -59,7 +59,7 @@ void processInput(GLFWwindow *window)
 
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        xcenter = xcenter + 0.01f / scale;
+        xcenter += 0.01f / scale * deltaT*100;
         if (xcenter > 1.0f)
         {
             xcenter = 1.0f;
@@ -117,14 +117,13 @@ void processInput(GLFWwindow *window)
 
 static void update_window_title(GLFWwindow* window)
 {
-    currentTime = glfwGetTime();
-    timeDiff = currentTime - prevTime;
 
-    std::string FPS = std::to_string(1.0 / timeDiff);
-    std::string ms = std::to_string(timeDiff * 1000);
+
+    std::string FPS = std::to_string(1.0 / deltaT);
+    std::string ms = std::to_string(deltaT * 1000);
     std::string new_title = "Fractal Explorer - " + FPS + " fps - " + ms + " ms";
     glfwSetWindowTitle(window, new_title.c_str());
-    prevTime = currentTime;
+    
 }
 
 int main(void)
@@ -221,6 +220,9 @@ int main(void)
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
+        currentTime = glfwGetTime();
+        deltaT = currentTime - prevTime;
+
         update_window_title(window);
 
         processInput(window);
@@ -255,6 +257,8 @@ int main(void)
 
         /* Poll for and process events */
         glfwPollEvents();
+
+        prevTime = currentTime;
     }
 
     glDeleteVertexArrays(1, &VAO);

@@ -29,10 +29,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 clean:
 	rm -f $(OBJS) $(BIN_DIR)/*
-
-run:
-	cd $(BIN_DIR)
-	$(NAME)
 	
 .PHONY: all clean install
 
