@@ -25,6 +25,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+int lastFractal = 0;
+
 void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -96,23 +98,32 @@ void processInput(GLFWwindow *window)
 
     if(glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
     {
-        yjulia = yjulia + 0.01f / scale;
+        yjulia +=  0.01f / scale * deltaT*100;
     }
 
     if(glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
     {
-        yjulia = yjulia - 0.01f / scale;
+        yjulia -= 0.01f / scale * deltaT*100;
     }
 
     if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
     {
-        xjulia = xjulia - 0.01f / scale;
+        xjulia -= 0.01f / scale * deltaT*100;
     }
 
     if(glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
     {
-        xjulia = xjulia + 0.01f / scale;
+        xjulia += 0.01f / scale * deltaT*100;
     }
+
+    if(glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS && lastFractal == GLFW_RELEASE)
+    {
+        if(fractal == 1) fractal = 0;
+        else fractal = 1;
+    }
+
+    lastFractal = glfwGetKey(window, GLFW_KEY_TAB);
+
 }
 
 static void update_window_title(GLFWwindow* window)
@@ -209,7 +220,7 @@ int main(void)
     move(2, 35);
     mvwprintw(console_window, 2, console_width/2-20, reinterpret_cast<const char*>(renderer));
     
-    WINDOW* parameters_win = newwin(10, 40, 3, 3);
+    WINDOW* parameters_win = newwin(12, 40, 3, 3);
     box(parameters_win, 0, 0);
     
     refresh();
@@ -242,10 +253,14 @@ int main(void)
         shader.setInt("fractal", fractal);
 
         mvwprintw(parameters_win, 0, 3, "Fractal Data");
-        mvwprintw(parameters_win, 2, 1, "Im: %.16f", ycenter);
-        mvwprintw(parameters_win, 1, 1, "Re: %.16f", xcenter);
-        mvwprintw(parameters_win, 3, 1, "Zoom: %18.1f", scale);
-        mvwprintw(parameters_win, 4, 1, "Iterations: %6d", int(iterations));
+        if(fractal == 0) mvwprintw(parameters_win, 1, 1, "Fractal: Mandelbrot");
+        else mvwprintw(parameters_win, 1, 1, "Fractal: Julia      "); 
+        mvwprintw(parameters_win, 3, 1, "Re: %.16f", xcenter);
+        mvwprintw(parameters_win, 4, 1, "Im: %.16f", ycenter);
+        mvwprintw(parameters_win, 5, 1, "Zoom: %18.1f", scale);
+        mvwprintw(parameters_win, 6, 1, "Iterations: %6d", int(iterations));
+        mvwprintw(parameters_win, 8, 1, "Julia X: %.16f", xjulia);
+        mvwprintw(parameters_win, 9, 1, "Julia Y: %.16f", yjulia);
         wrefresh(parameters_win);
 
         
