@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Shader.h"
+
 #include <ncurses/ncurses.h>
 
 int WIDTH = 640;
@@ -162,8 +163,7 @@ int main(void)
     const GLubyte* vendor = glGetString(GL_VENDOR); // Returns the vendor
     const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
     
-    //std::cout << vendor << renderer << std::endl;
-    
+    std::cout << vendor << renderer << std::endl;
     
 
     glViewport(0, 0, WIDTH, HEIGHT);
@@ -210,7 +210,6 @@ int main(void)
     move(2, 35);
     mvwprintw(console_window, 2, console_width/2-20, reinterpret_cast<const char*>(renderer));
     
-
     WINDOW* parameters_win = newwin(10, 40, 3, 3);
     box(parameters_win, 0, 0);
     
@@ -241,8 +240,8 @@ int main(void)
         shader.setInt("fractal", fractal);
 
         mvwprintw(parameters_win, 0, 3, "Fractal Data");
-        mvwprintw(parameters_win, 1, 1, "Re: %.16f", xcenter);
         mvwprintw(parameters_win, 2, 1, "Im: %.16f", ycenter);
+        mvwprintw(parameters_win, 1, 1, "Re: %.16f", xcenter);
         mvwprintw(parameters_win, 3, 1, "Zoom: %18.1f", scale);
         mvwprintw(parameters_win, 4, 1, "Iterations: %6d", int(iterations));
         wrefresh(parameters_win);
