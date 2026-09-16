@@ -4,31 +4,33 @@ CXXFLAGS = -Wall -g
 SRC_DIR = src
 LIB_DIR = lib
 INC_DIR = include
-OBJ_DIR = obj
 BIN_DIR = bin
-LIBS = -lglfw3dll -lncursesw -DNCURSES_STATIC
+LIBS_WIN = -lglfw3dll -lncursesw -DNCURSES_STATIC
+LIBS_LINUX = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lncursesw -DNCURSES_STATIC
 
-NAME = fractal_explorer.exe
+NAME = fractal_explorer
 OUT = $(BIN_DIR)/$(NAME)
 
-SRCS = $(wildcard $(SRC_DIR)/*.cpp) 
-OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-
-$(OUT): $(OBJS)
+win:
 	-mkdir $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -I $(INC_DIR) -L $(LIB_DIR) $(OBJS) $(SRC_DIR)/glad.c $(LIBS) -o $(OUT)
+	$(CXX) $(CXXFLAGS) -I $(INC_DIR) -L $(LIB_DIR) $(SRC_DIR)/*.cpp $(SRC_DIR)/glad.c $(LIBS_WIN) -o $(OUT).exe
 	cp $(SRC_DIR)/vertex.vs $(BIN_DIR)
 	cp $(SRC_DIR)/fragment.fs $(BIN_DIR)
 	cp $(SRC_DIR)/glfw3.dll $(BIN_DIR)
 
-# Regla para compilar archivos .cpp a .o
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	-mkdir $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -c $< -o $@
+
+
+
+linux:
+	-mkdir $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) -I $(INC_DIR) -L $(LIB_DIR) $(SRC_DIR)/*.cpp $(SRC_DIR)/glad.c $(LIBS_LINUX) -o $(OUT).o
+	cp $(SRC_DIR)/vertex.vs $(BIN_DIR)
+	cp $(SRC_DIR)/fragment.fs $(BIN_DIR)
+
 
 clean:
-	rm -f $(OBJS) $(BIN_DIR)/*
+	rm -f $(BIN_DIR)/*
 	
-.PHONY: all clean install
+.PHONY: clean linux
 

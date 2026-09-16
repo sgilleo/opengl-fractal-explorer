@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Shader.h"
 
-#include <ncurses/ncurses.h>
+#include <ncurses.h>
 
 int WIDTH = 640;
 int HEIGHT = 480;
